@@ -1,33 +1,21 @@
 #include <ftxui/ftxui.hpp>
 
+#include "src/app/AlblyApp.h"
+
 using namespace ftxui;
 
 int main() {
+    using namespace ftxui;
+
     auto screen = ScreenInteractive::TerminalOutput();
 
-    std::vector<std::string> entries = {
-        "Collection",
-        "Search",
-        "New Release",
-        "Listen Later",
-        "Settings"
-    };
-
-    int selected = 0;
-
-    auto menu = Menu(&entries, &selected);
-
-    auto renderer = Renderer(menu, [&] {
-        return vbox({
-            text("Albly") | bold | center,
-            separator(),
-            menu->Render(),
-            separator(),
-            text("↑ ↓ Choose | Enter Select")
-        }) | border;
+    AlblyApp app([&] {
+        screen.Exit();
     });
 
-    screen.Loop(renderer);
+    auto component = app.Create();
+
+    screen.Loop(component);
 
     return 0;
 }

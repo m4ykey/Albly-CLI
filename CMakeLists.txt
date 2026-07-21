@@ -15,7 +15,14 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(ftxui)
 
-add_executable(Albly_CLI main.cpp)
+add_executable(Albly_CLI main.cpp
+        src/ui/MainMenu.cpp
+        src/ui/MainMenu.h
+        src/app/AlblyApp.cpp
+        src/app/AlblyApp.h
+        src/ui/SearchView.cpp
+        src/ui/SearchView.h
+)
 
 target_link_libraries(
         Albly_CLI
