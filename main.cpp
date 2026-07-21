@@ -1,12 +1,18 @@
-#include <iostream>
+#include <ftxui/ftxui.hpp>
+
+using namespace ftxui;
 
 int main() {
-    const auto lang = "C++";
-    std::cout << "Hello and welcome to " << lang << "!\n";
+    auto screen = ScreenInteractive::TerminalOutput();
 
-    for (int i = 1; i <= 5; i++) {
-        std::cout << "i = " << i << std::endl;
-    }
+    auto button = Button(
+        "Exit",
+        [&] {
+            screen.Exit();
+        }
+    );
+
+    screen.Loop(button);
 
     return 0;
 }
