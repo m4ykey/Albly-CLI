@@ -11,11 +11,15 @@ using namespace ftxui;
 AlblyApp::AlblyApp(std::function<void()> callback) : exitCallback(callback) { }
 
 Component AlblyApp::Create() {
-    auto menu = RenderMenu();
+    container = Container::Tab(
+        {
+            RenderMenu(),
+            RenderSearch()
+        },
+        &currentTab
+    );
 
-    return menu | CatchEvent([](Event event) {
-        return false;
-    });
+    return container;
 }
 
 Component AlblyApp::RenderMenu() {
@@ -27,6 +31,11 @@ Component AlblyApp::RenderMenu() {
     menu |= CatchEvent(
         [this](Event event) {
             if (event == Event::Return) {
+                if (selected == 1) {
+                    currentTab = 1;
+                    return true;
+                }
+
                 if (selected == 2) {
                     exitCallback();
                     return true;
@@ -48,5 +57,18 @@ Component AlblyApp::RenderMenu() {
                 menu->Render()
 
             }) | border;
+    });
+}
+
+Component AlblyApp::RenderSearch() {
+    return Renderer([] {
+        return vbox({
+        text("Search")
+        | bold
+        | center,
+
+        separator(),
+        text("Search View")
+        }) | border;
     });
 }

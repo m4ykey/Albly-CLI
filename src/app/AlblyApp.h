@@ -12,7 +12,20 @@ public:
     ftxui::Component Create();
 
 private:
+    ftxui::Component root;
+
+    enum class Screen {
+        Menu,
+        Search
+    };
+
+    Screen currentScreen = Screen::Menu;
+
     ftxui::Component RenderMenu();
+    ftxui::Component RenderSearch();
+
+    ftxui::Component container;
+    int currentTab = 0;
 
     std::function<void()> exitCallback;
 
