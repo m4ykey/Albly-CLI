@@ -1,0 +1,9 @@
+# Visual Studio
+.vs/
+out/
+*.user
+
+# CMake
+CMakeUserPresets.json
+build/
+cmake-build-debug

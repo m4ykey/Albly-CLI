@@ -2,28 +2,28 @@
 
 #include <vector>
 #include <string>
-#include <functional>
-
+#include <string>
 #include <ftxui/component/component.hpp>
 
 namespace ui {
-    class MainMenu {
-    public:
-        MainMenu(std::function<void()> callback);
-        ftxui::Component Create();
+	class MainMenu {
+	public:
+		MainMenu(std::function<void(int)> onSelect);
 
-    private:
-        std::function<void()> onSearch;
+		ftxui::Component Create();
 
-        std::vector<std::string> entries {
-            "Collection",
-            "Search",
-            "New Release",
-            "Listen Later",
-            "Settings",
-            "Exit"
-        };
+	private:
+		std::function<void(int)> onSelect;
 
-        int selected = 0;
-    };
+		std::vector<std::string> entries{
+			"Collection",
+			"Search",
+			"New Release",
+			"Listen Later",
+			"Settings",
+			"Exit"
+		};
+
+		int selected = 0;
+	};
 }

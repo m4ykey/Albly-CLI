@@ -1,6 +1,5 @@
 #include <ftxui/ftxui.hpp>
-
-#include "src/app/AlblyApp.h"
+#include "src/app/App.h"
 
 using namespace ftxui;
 
@@ -9,11 +8,11 @@ int main() {
 
     auto screen = ScreenInteractive::TerminalOutput();
 
-    AlblyApp app([&] {
+    app::App myApp([&] {
         screen.Exit();
     });
 
-    auto component = app.Create();
+    auto component = myApp.Create();
 
     screen.Loop(component);
 
