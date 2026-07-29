@@ -5,8 +5,11 @@ namespace app {
 
 	ftxui::Component App::Create() {
 		mainMenu = std::make_unique<ui::MainMenu>([this](int index) {
-			if (index == 1) {
+			if (index == 0) {
 				currentTab = 1;
+			}
+			if (index == 1) {
+				currentTab = 2;
 			}
 			if (index == 5) {
 				exitCallback();
@@ -17,12 +20,17 @@ namespace app {
 			currentTab = 0;
 		});
 
+		collectionScreen = std::make_unique<ui::CollectionScreen>([this]() {
+			currentTab = 0;
+		});
+
 		container = ftxui::Container::Tab(
 			{
 				mainMenu->Create(),
+				collectionScreen->Create(),
 				searchScreen->Create()
 			},
-			&currentTab
+			&currentTab 
 		);
 
 		return container;

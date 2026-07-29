@@ -2,7 +2,6 @@
 
 #include <vector>
 #include <string>
-#include <string>
 #include <ftxui/component/component.hpp>
 
 namespace ui {
