@@ -10,15 +10,37 @@ include(FetchContent)
 FetchContent_Declare(
         ftxui
         GIT_REPOSITORY https://github.com/ArthurSonzogni/ftxui
-        GIT_TAG v7.0.1
+        GIT_TAG v7.0.3
 )
 
-FetchContent_MakeAvailable(ftxui)
+FetchContent_Declare(
+        httplib
+        GIT_REPOSITORY https://github.com/yhirose/cpp-httplib
+        GIT_TAG v0.53.0
+)
 
-add_executable(Albly_CLI main.cpp "src/ui/MainMenu.h" "src/ui/MainMenu.cpp" "src/app/App.h" "src/app/App.cpp" "src/ui/SearchScreen.h" "src/ui/SearchScreen.cpp" "src/ui/CollectionScreen.h" "src/ui/CollectionScreen.cpp"  )
+FetchContent_Declare(
+        json
+        GIT_REPOSITORY https://github.com/nlohmann/json
+        GIT_TAG v3.12.0
+)
+
+FetchContent_MakeAvailable(ftxui httplib json)
+
+add_executable(Albly_CLI 
+    main.cpp 
+    "src/ui/MainMenu.cpp" 
+    "src/app/App.cpp"
+    "src/ui/SearchScreen.cpp"
+    "src/ui/CollectionScreen.cpp" 
+    "src/mapper/SearchAlbumMapper.cpp"
+    "src/service/SearchAlbumService.cpp"
+)
 
 target_link_libraries(
         Albly_CLI
         PRIVATE
         ftxui::ftxui
+        httplib::httplib
+        nlohmann_json::nlohmann_json
 )
