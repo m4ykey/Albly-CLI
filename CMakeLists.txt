@@ -31,6 +31,8 @@ FetchContent_Declare(
         GIT_TAG v3.12.0
 )
 
+find_package(OpenSSL REQUIRED)
+
 FetchContent_MakeAvailable(ftxui httplib json)
 
 add_executable(Albly_CLI 
@@ -43,10 +45,18 @@ add_executable(Albly_CLI
     "src/service/SearchAlbumService.cpp"
 )
 
+target_compile_definitions(
+    Albly_CLI
+    PRIVATE
+    CPPHTTPLIB_OPENSSL_SUPPORT
+)
+
 target_link_libraries(
         Albly_CLI
         PRIVATE
         ftxui::ftxui
         httplib::httplib
         nlohmann_json::nlohmann_json
+        OpenSSL::SSL
+        OpenSSL::Crypto
 )

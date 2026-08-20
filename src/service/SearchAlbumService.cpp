@@ -22,7 +22,7 @@ namespace service {
 			"&type=master" +
 			"&per_page=" + std::to_string(PAGE_SIZE) +
 			"&page=" + std::to_string(page) +
-			"&token=" + apiKey;
+			"&token" + apiKey;
 		
 		return url;
 	}
@@ -50,7 +50,12 @@ namespace service {
 		}
 
 		if (response->status != 200) {
-			throw std::runtime_error("Discogs API returned an error");
+			throw std::runtime_error(
+				"Discogs API returned status: " +
+				std::to_string(response->status) +
+				"\nResponse: " + 
+				response->body
+			);
 		}
 
 		std::string body = response->body;
