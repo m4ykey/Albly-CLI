@@ -4,7 +4,11 @@
 #include <ftxui/component/event.hpp>
 
 namespace ui {
-	SearchScreen::SearchScreen(std::function<void()> onBack) : 
+	SearchScreen::SearchScreen(
+		service::SearchAlbumService& searchAlbumService,
+		std::function<void()> onBack
+	) : 
+		searchAlbumService(searchAlbumService),
 		onBack(std::move(onBack)) {  }
 
 	ftxui::Component SearchScreen::Create() {

@@ -4,6 +4,9 @@
 #include <httplib.h>
 #include <nlohmann/json.hpp>
 
+#include "../dto/SearchAlbumRootDto.h"
+#include "../mapper/SearchAlbumMapper.h"
+
 namespace service {
 	
 	SearchAlbumService::SearchAlbumService(const std::string& apiKey) : apiKey(apiKey) {}
@@ -54,8 +57,25 @@ namespace service {
 
 		nlohmann::json data = nlohmann::json::parse(body);
 
+		dto::SearchAlbumRootDto result;
+
 		for (const auto& item : data["results"]) {
-			
+			dto::AlbumSearchResultDto album;
+
+			album.title = item["title"];
+			album.cover_image = item["cover_image"];
+			album.id = item["id"];
+			album.thumb = item["thumb"];
+
+			if (item.contains("master_id") && !item["master_id"].is_null()) {
+				album.master_id = item["master_id"];
+			}
+
+			result.results.push_back(album);
 		}
+
+		model::SearchAlbumRoot domainResults = mapper::mapToDomain(result);
+
+		return domainResults.results;
 	}
 }

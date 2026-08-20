@@ -7,6 +7,7 @@
 #include "../ui/MainMenu.h"
 #include "../ui/SearchScreen.h"
 #include "../ui/CollectionScreen.h"
+#include "../service/SearchAlbumService.h"
 
 namespace app {
 	class App {
@@ -20,6 +21,8 @@ namespace app {
 		std::unique_ptr<ui::MainMenu> mainMenu;
 		std::unique_ptr<ui::SearchScreen> searchScreen;
 		std::unique_ptr<ui::CollectionScreen> collectionScreen;
+
+		std::unique_ptr<service::SearchAlbumService> searchAlbumService;
 
 		ftxui::Component container;
 		int currentTab = 0;

@@ -5,6 +5,12 @@ project(Albly_CLI)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+configure_file(
+    ${CMAKE_SOURCE_DIR}/config.properties
+    ${CMAKE_BINARY_DIR}/config.properties
+    COPYONLY
+)
+
 include(FetchContent)
 
 FetchContent_Declare(
