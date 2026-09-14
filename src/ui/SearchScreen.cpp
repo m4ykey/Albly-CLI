@@ -54,11 +54,11 @@ namespace ui {
 				separator(),
 				text("Page " + std::to_string(currentPage) + " / " + std::to_string(totalPages)) | center,
 				separator(),
-				text("↑ ↓ Select | Enter Search | Esc Back")
+				text("↑ ↓ Select | Enter Search | Esc Focus/Back | ← Previous Page | → Next Page")
 				}) | border;
 			});
 
-		return renderer | CatchEvent([this, resultsComponent](Event event) {
+		return renderer | CatchEvent([this, input, resultsComponent](Event event) {
 			if (event == Event::ArrowDown) {
 				if (!results.empty() && selectedIndex < static_cast<int>(results.size()) - 1) {
 					++selectedIndex;
@@ -94,6 +94,17 @@ namespace ui {
 			}
 
 			if (event == Event::Escape) {
+				if (!searching) {
+					searching = true;
+					input->TakeFocus();
+					return true;
+				}
+
+				query.clear();
+				results.clear();
+				currentPage = 1;
+				totalPages = 1;
+				selectedIndex = 0;
 				onBack();
 				return true;
 			}
