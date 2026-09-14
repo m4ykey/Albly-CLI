@@ -52,6 +52,8 @@ namespace ui {
 				separator(),
 				vbox(resultElements),
 				separator(),
+				text("Page " + std::to_string(currentPage) + " / " + std::to_string(totalPages)) | center,
+				separator(),
 				text("↑ ↓ Select | Enter Search | Esc Back")
 				}) | border;
 			});
@@ -99,6 +101,20 @@ namespace ui {
 			if (event == Event::ArrowRight) {
 				if (currentPage < totalPages) {
 					++currentPage;
+
+					auto searchResult = searchAlbumService.searchAlbum(query, currentPage);
+
+					results = searchResult.results;
+					totalPages = searchResult.pagination.pages;
+					selectedIndex = 0;
+				}
+
+				return true;
+			}
+
+			if (event == Event::ArrowLeft) {
+				if (currentPage > 1) {
+					--currentPage;
 
 					auto searchResult = searchAlbumService.searchAlbum(query, currentPage);
 
