@@ -20,7 +20,15 @@ namespace mapper {
 			results.push_back(mapToDomain(result));
 		}
 
+		model::Pagination pagination{
+			dto.pagination.page,
+			dto.pagination.pages,
+			dto.pagination.per_page,
+			dto.pagination.items
+		};
+
 		return model::SearchAlbumRoot{
+			pagination,
 			results
 		};
 	}

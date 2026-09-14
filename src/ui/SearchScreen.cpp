@@ -18,8 +18,13 @@ namespace ui {
 
 		auto input = Input(&query, "Search...");
 
+		auto resultsComponent = Renderer([] {
+			return text("Results");
+		});
+
 		auto layout = Container::Vertical({
-			input
+			input,
+			resultsComponent
 		});
 
 		auto renderer = Renderer(layout, [this, input] {
@@ -51,7 +56,7 @@ namespace ui {
 				}) | border;
 			});
 
-		return renderer | CatchEvent([this](Event event) {
+		return renderer | CatchEvent([this, resultsComponent](Event event) {
 			if (event == Event::ArrowDown) {
 				if (!results.empty() && selectedIndex < static_cast<int>(results.size()) - 1) {
 					++selectedIndex;
@@ -70,8 +75,14 @@ namespace ui {
 
 			if (event == Event::Return) {
 				try {
-					results = searchAlbumService.searchAlbum(query, 1);
+					auto searchResult = searchAlbumService.searchAlbum(query, currentPage);
+
+					results = searchResult.results;
+					totalPages = searchResult.pagination.pages;
+
 					selectedIndex = 0;
+					searching = false;
+					resultsComponent->TakeFocus();
 				}
 				catch (const std::exception& exception) {
 					std::cerr << "Search failed: " << exception.what() << '\n';
@@ -84,6 +95,21 @@ namespace ui {
 				onBack();
 				return true;
 			}
+
+			if (event == Event::ArrowRight) {
+				if (currentPage < totalPages) {
+					++currentPage;
+
+					auto searchResult = searchAlbumService.searchAlbum(query, currentPage);
+
+					results = searchResult.results;
+					totalPages = searchResult.pagination.pages;
+					selectedIndex = 0;
+				}
+
+				return true;
+			}
+
 			return false;
 		});
 	}

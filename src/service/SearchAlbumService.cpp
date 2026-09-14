@@ -27,7 +27,7 @@ namespace service {
 		return url;
 	}
 	
-	std::vector<model::AlbumSearchResult> SearchAlbumService::searchAlbum(
+	model::SearchAlbumRoot SearchAlbumService::searchAlbum(
 		const std::string& query,
 		int page
 	) {
@@ -64,6 +64,13 @@ namespace service {
 
 		dto::SearchAlbumRootDto result;
 
+		const auto& pagination = data["pagination"];
+
+		result.pagination.page = pagination["page"];
+		result.pagination.pages = pagination["pages"];
+		result.pagination.per_page = pagination["per_page"];
+		result.pagination.items = pagination["items"];
+
 		for (const auto& item : data["results"]) {
 			dto::AlbumSearchResultDto album;
 
@@ -80,7 +87,6 @@ namespace service {
 		}
 
 		model::SearchAlbumRoot domainResults = mapper::mapToDomain(result);
-
-		return domainResults.results;
+		return domainResults;
 	}
 }

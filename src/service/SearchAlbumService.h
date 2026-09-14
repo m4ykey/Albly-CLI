@@ -10,7 +10,7 @@ namespace service {
 	public:
 		SearchAlbumService(const std::string& apiKey);
 
-		std::vector<model::AlbumSearchResult> searchAlbum(
+		model::SearchAlbumRoot searchAlbum(
 			const std::string& query, 
 			int page
 		);

@@ -24,6 +24,11 @@ namespace ui {
 		std::vector<model::AlbumSearchResult> results;
 		int selectedIndex = 0;
 
+		int currentPage = 1;
+		int totalPages = 1;
+
+		bool searching = false;
+
 		service::SearchAlbumService& searchAlbumService;
 	};
 }

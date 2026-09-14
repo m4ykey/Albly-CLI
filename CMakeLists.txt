@@ -32,6 +32,7 @@ FetchContent_Declare(
 )
 
 find_package(OpenSSL REQUIRED)
+find_package(SQLite3 REQUIRED)
 
 FetchContent_MakeAvailable(ftxui httplib json)
 
@@ -59,4 +60,5 @@ target_link_libraries(
         nlohmann_json::nlohmann_json
         OpenSSL::SSL
         OpenSSL::Crypto
+        SQLite::SQLite3
 )
