@@ -1,15 +1,20 @@
 #pragma once
 
-#include <functional>
 #include <ftxui/component/component.hpp>
+#include <functional>
 
 namespace ui {
-	class CollectionScreen {
+	class AlbumDetailScreen {
 	public:
-		CollectionScreen(std::function<void()> onBack);
+		AlbumDetailScreen(
+			std::function<void()> onBack,
+			int albumId
+		);
 
 		ftxui::Component Create();
+
 	private:
 		std::function<void()> onBack;
+		int albumId;
 	};
 }

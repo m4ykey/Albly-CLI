@@ -5,6 +5,8 @@
 #include <string>
 #include <fstream>
 
+#include <ftxui/component/event.hpp>
+
 namespace app {
 	App::App(std::function<void()> exitCallback) : exitCallback(std::move(exitCallback)) {}
 
@@ -49,6 +51,19 @@ namespace app {
 			*searchAlbumService,
 			[this]() {
 				currentTab = 0;
+			},
+			[this](int albumId) {
+				selectedAlbumId = albumId;
+				
+				albumDetailScreen = std::make_unique<ui::AlbumDetailScreen>(
+					[this]() {
+						currentScreen = Screen::Main;
+						currentTab = 2;
+					},
+					selectedAlbumId
+				);
+
+				currentScreen = Screen::AlbumDetail;
 			}
 		);
 
@@ -65,6 +80,22 @@ namespace app {
 			&currentTab 
 		);
 
-		return container;
+		auto root = ftxui::Renderer([this] {
+			if (currentScreen == Screen::AlbumDetail && albumDetailScreen) {
+				return albumDetailScreen->Create()->Render();
+			}
+
+			return container->Render();
+		});
+
+		root = root | ftxui::CatchEvent([this](ftxui::Event event) {
+			if (currentScreen == Screen::Main) {
+				return container->OnEvent(event);
+			}
+
+			return false;
+		});
+
+		return root;
 	}
 }

@@ -8,10 +8,12 @@
 namespace ui {
 	SearchScreen::SearchScreen(
 		service::SearchAlbumService& searchAlbumService,
-		std::function<void()> onBack
+		std::function<void()> onBack,
+		std::function<void(int)> onAlbumClick
 	) : 
 		searchAlbumService(searchAlbumService),
-		onBack(std::move(onBack)) {  }
+		onBack(std::move(onBack)),
+		onAlbumClick(std::move(onAlbumClick)) {  }
 
 	ftxui::Component SearchScreen::Create() {
 		using namespace ftxui;
@@ -50,11 +52,11 @@ namespace ui {
 				separator(),
 				hbox({ text("Search: "), input->Render() }),
 				separator(),
-				vbox(resultElements),
+				loading ? text("Loading...") | center : vbox(resultElements),
 				separator(),
 				text("Page " + std::to_string(currentPage) + " / " + std::to_string(totalPages)) | center,
 				separator(),
-				text("↑ ↓ Select | Enter Search | Esc Focus/Back | ← Previous Page | → Next Page")
+				text("↑ ↓ Select | Enter Search | Esc Focus/Back | ←/J Previous Page | →/L Next Page | M Check Album")
 				}) | border;
 			});
 
@@ -76,6 +78,8 @@ namespace ui {
 			}
 
 			if (event == Event::Return) {
+				loading = true;
+
 				try {
 					auto searchResult = searchAlbumService.searchAlbum(query, currentPage);
 
@@ -89,6 +93,8 @@ namespace ui {
 				catch (const std::exception& exception) {
 					std::cerr << "Search failed: " << exception.what() << '\n';
 				}
+
+				loading = false;
 
 				return true;
 			}
@@ -109,7 +115,7 @@ namespace ui {
 				return true;
 			}
 
-			if (event == Event::ArrowRight) {
+			if (event == Event::ArrowRight || event == Event::L || event == Event::l) {
 				if (currentPage < totalPages) {
 					++currentPage;
 
@@ -123,7 +129,7 @@ namespace ui {
 				return true;
 			}
 
-			if (event == Event::ArrowLeft) {
+			if (event == Event::ArrowLeft || event == Event::J || event == Event::j) {
 				if (currentPage > 1) {
 					--currentPage;
 
@@ -132,6 +138,14 @@ namespace ui {
 					results = searchResult.results;
 					totalPages = searchResult.pagination.pages;
 					selectedIndex = 0;
+				}
+
+				return true;
+			}
+
+			if (event == Event::M || event == Event::m) {
+				if (!results.empty()) {
+					onAlbumClick(results[selectedIndex].master_id);
 				}
 
 				return true;

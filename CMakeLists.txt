@@ -41,6 +41,7 @@ add_executable(Albly_CLI
     "src/ui/MainMenu.cpp" 
     "src/app/App.cpp"
     "src/ui/SearchScreen.cpp"
+    "src/ui/AlbumDetailScreen.cpp"
     "src/ui/CollectionScreen.cpp" 
     "src/mapper/SearchAlbumMapper.cpp"
     "src/service/SearchAlbumService.cpp"
