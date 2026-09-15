@@ -24,21 +24,41 @@ namespace ui {
 			std::function<void(int)> onAlbumClick
 		);
 
+		~SearchScreen();
+
 		ftxui::Component Create();
 	private:
-		std::string query;
+		void StartSearch();
+		void CheckSearchResult();
+
+		service::SearchAlbumService& searchAlbumService;
+		ftxui::ScreenInteractive& screen;
+
+		ftxui::Component input;
+		ftxui::Component resultsComponent;
+
 		std::function<void()> onBack;
 		std::function<void(int)> onAlbumClick;
 
+		std::string query;
+
 		std::vector<model::AlbumSearchResult> results;
+
 		int selectedIndex = 0;
 
 		int currentPage = 1;
 		int totalPages = 1;
 
 		bool searching = false;
+
 		std::atomic<bool> loading = false;
 
-		service::SearchAlbumService& searchAlbumService;
+		std::thread searchThread;
+
+		std::mutex resultMutex;
+
+		std::optional<model::SearchAlbumRoot> pendingResult;
+
+		std::string errorMessage;
 	};
 }

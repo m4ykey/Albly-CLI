@@ -3,6 +3,7 @@
 #include <memory>
 #include <functional>
 #include <ftxui/component/component.hpp>
+#include <ftxui/component/screen_interactive.hpp>
 
 #include "../ui/MainMenu.h"
 #include "../ui/SearchScreen.h"
@@ -13,10 +14,15 @@
 namespace app {
 	class App {
 	public:
-		App(std::function<void()> exitCallback);
+		App(
+			ftxui::ScreenInteractive& screen,
+			std::function<void()> exitCallback
+		);
 
 		ftxui::Component Create();
 	private:
+		ftxui::ScreenInteractive& screen;
+
 		enum class Screen {
 			Main,
 			AlbumDetail

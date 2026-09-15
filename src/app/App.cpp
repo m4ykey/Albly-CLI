@@ -8,7 +8,11 @@
 #include <ftxui/component/event.hpp>
 
 namespace app {
-	App::App(std::function<void()> exitCallback) : exitCallback(std::move(exitCallback)) {}
+	App::App(
+		ftxui::ScreenInteractive& screen,
+		std::function<void()> exitCallback
+	) : screen(screen),
+		exitCallback(std::move(exitCallback)) {}
 
 	std::string loadApiKey() {
 		std::ifstream file("config.properties");
@@ -49,6 +53,8 @@ namespace app {
 
 		searchScreen = std::make_unique<ui::SearchScreen>(
 			*searchAlbumService,
+			screen,
+
 			[this]() {
 				currentTab = 0;
 			},

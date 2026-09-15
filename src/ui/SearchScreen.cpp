@@ -4,23 +4,91 @@
 #include <ftxui/component/event.hpp>
 
 #include <iostream>
+#include <utility>
 
 namespace ui {
 	SearchScreen::SearchScreen(
 		service::SearchAlbumService& searchAlbumService,
+		ftxui::ScreenInteractive& screen,
 		std::function<void()> onBack,
 		std::function<void(int)> onAlbumClick
 	) : 
 		searchAlbumService(searchAlbumService),
+		screen(screen),
 		onBack(std::move(onBack)),
 		onAlbumClick(std::move(onAlbumClick)) {  }
+
+	SearchScreen::~SearchScreen() {
+		if (searchThread.joinable()) {
+			searchThread.join();
+		}
+	}
+
+	void SearchScreen::StartSearch() {
+		if (loading) {
+			return;
+		}
+
+		if (query.empty()) {
+			return;
+		}
+
+		loading = true;
+		errorMessage.clear();
+
+		const std::string searchQuery = query;
+		const int searchPage = currentPage;
+
+		if (searchThread.joinable()) {
+			searchThread.join();
+		}
+
+		searchThread = std::thread([this, searchQuery, searchPage]() {
+			try {
+				auto searchResult = searchAlbumService.searchAlbum(searchQuery, searchPage);
+				{
+					std::lock_guard<std::mutex> lock(resultMutex);
+					pendingResult = std::move(searchResult);
+				}
+			}
+			catch (const std::exception& exception) {
+				std::lock_guard<std::mutex> lock(resultMutex);
+				errorMessage = exception.what();
+			}
+
+			loading = false;
+
+			screen.PostEvent(ftxui::Event::Custom);
+		});
+	}
+
+	void SearchScreen::CheckSearchResult() {
+		if (loading) {
+			return;
+		}
+
+		std::lock_guard<std::mutex> lock(resultMutex);
+
+		if (pendingResult) {
+			results = pendingResult->results;
+			totalPages = pendingResult->pagination.pages;
+			selectedIndex = 0;
+			searching = false;
+
+			pendingResult.reset();
+
+			if (resultsComponent) {
+				resultsComponent->TakeFocus();
+			}
+		}
+	}
 
 	ftxui::Component SearchScreen::Create() {
 		using namespace ftxui;
 
-		auto input = Input(&query, "Search...");
+		input = Input(&query, "Search...");
 
-		auto resultsComponent = Renderer([] {
+		resultsComponent = Renderer([] {
 			return text("Results");
 		});
 
@@ -29,7 +97,9 @@ namespace ui {
 			resultsComponent
 		});
 
-		auto renderer = Renderer(layout, [this, input] {
+		auto renderer = Renderer(layout, [this] {
+			CheckSearchResult();
+
 			Elements resultElements;
 
 			for (int i = 0; i < static_cast<int>(results.size()); ++i) {
@@ -47,12 +117,27 @@ namespace ui {
 				resultElements.push_back(element);
 			}
 
+			Element content;
+
+			if (loading) {
+				content = text("Loading...") | center;
+			}
+			else if (!errorMessage.empty()) {
+				content = text("Search failed: " + errorMessage) | center;
+			}
+			else if (results.empty()) {
+				content = text("No results") | center;
+			}
+			else {
+				content = vbox(resultElements);
+			}
+
 			return vbox({
 				text("SEARCH") | bold | center,
 				separator(),
 				hbox({ text("Search: "), input->Render() }),
 				separator(),
-				loading ? text("Loading...") | center : vbox(resultElements),
+				content,
 				separator(),
 				text("Page " + std::to_string(currentPage) + " / " + std::to_string(totalPages)) | center,
 				separator(),
@@ -60,7 +145,11 @@ namespace ui {
 				}) | border;
 			});
 
-		return renderer | CatchEvent([this, input, resultsComponent](Event event) {
+		return renderer | CatchEvent([this](Event event) {
+			if (loading) {
+				return true;
+			}
+
 			if (event == Event::ArrowDown) {
 				if (!results.empty() && selectedIndex < static_cast<int>(results.size()) - 1) {
 					++selectedIndex;
@@ -78,23 +167,7 @@ namespace ui {
 			}
 
 			if (event == Event::Return) {
-				loading = true;
-
-				try {
-					auto searchResult = searchAlbumService.searchAlbum(query, currentPage);
-
-					results = searchResult.results;
-					totalPages = searchResult.pagination.pages;
-
-					selectedIndex = 0;
-					searching = false;
-					resultsComponent->TakeFocus();
-				}
-				catch (const std::exception& exception) {
-					std::cerr << "Search failed: " << exception.what() << '\n';
-				}
-
-				loading = false;
+				StartSearch();
 
 				return true;
 			}
@@ -108,10 +181,15 @@ namespace ui {
 
 				query.clear();
 				results.clear();
+
 				currentPage = 1;
 				totalPages = 1;
 				selectedIndex = 0;
+
+				searching = false;
+
 				onBack();
+
 				return true;
 			}
 
@@ -119,11 +197,7 @@ namespace ui {
 				if (currentPage < totalPages) {
 					++currentPage;
 
-					auto searchResult = searchAlbumService.searchAlbum(query, currentPage);
-
-					results = searchResult.results;
-					totalPages = searchResult.pagination.pages;
-					selectedIndex = 0;
+					StartSearch();
 				}
 
 				return true;
@@ -133,11 +207,7 @@ namespace ui {
 				if (currentPage > 1) {
 					--currentPage;
 
-					auto searchResult = searchAlbumService.searchAlbum(query, currentPage);
-
-					results = searchResult.results;
-					totalPages = searchResult.pagination.pages;
-					selectedIndex = 0;
+					StartSearch();
 				}
 
 				return true;

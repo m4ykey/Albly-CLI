@@ -11,7 +11,7 @@ int main() {
 
     auto screen = ScreenInteractive::TerminalOutput();
 
-    app::App myApp([&] {
+    app::App myApp(screen, [&] {
         screen.Exit();
     });
 
