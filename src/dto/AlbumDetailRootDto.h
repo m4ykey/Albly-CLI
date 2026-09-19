@@ -5,6 +5,17 @@
 
 namespace dto {
 
+	struct ArtistsDto {
+		std::string name;
+	};
+
+	struct TrackListDto {
+		std::string position;
+		std::string type_;
+		std::string title;
+		std::string duration;
+	};
+
 	struct AlbumDetailRootDto {
 		int id = 0;
 		int main_release = 0;
@@ -16,18 +27,7 @@ namespace dto {
 		int year = 0;
 		std::string title;
 		std::string uri;
-		std::vector<ArtistDto> artists;
+		std::vector<ArtistsDto> artists;
 		std::vector<TrackListDto> tracklist;
-	};
-
-	struct ArtistsDto {
-		std::string name;
-	};
-
-	struct TrackListDto {
-		std::string position;
-		std::string type_;
-		std::string title;
-		std::string duration;
 	};
 }

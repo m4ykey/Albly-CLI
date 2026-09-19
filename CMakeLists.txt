@@ -46,6 +46,7 @@ add_executable(Albly_CLI
     "src/mapper/SearchAlbumMapper.cpp"
     "src/service/SearchAlbumService.cpp"
     "src/mapper/AlbumDetailMapper.cpp"
+    "src/service/AlbumDetailService.cpp"
 )
 
 target_compile_definitions(
