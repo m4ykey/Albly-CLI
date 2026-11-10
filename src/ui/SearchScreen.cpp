@@ -150,8 +150,30 @@ namespace ui {
 				return true;
 			}
 
+			const bool typing = input->Focused();
+
+			if (typing) {
+				if (event == Event::Return) {
+					currentPage = 1;
+					StartSearch();
+
+					return true;
+				}
+
+				if (event == Event::Escape) {
+					if (!results.empty()) {
+						resultsComponent->TakeFocus();
+					}
+					else {
+						onBack();
+					}
+					return true;
+				}
+				return false;
+			}
+
 			if (event == Event::ArrowDown) {
-				if (!results.empty() && selectedIndex < static_cast<int>(results.size()) - 1) {
+				if (selectedIndex < static_cast<int>(results.size()) - 1) {
 					++selectedIndex;
 				}
 
@@ -166,34 +188,7 @@ namespace ui {
 				return true;
 			}
 
-			if (event == Event::Return) {
-				StartSearch();
-
-				return true;
-			}
-
-			if (event == Event::Escape) {
-				if (!searching) {
-					searching = true;
-					input->TakeFocus();
-					return true;
-				}
-
-				query.clear();
-				results.clear();
-
-				currentPage = 1;
-				totalPages = 1;
-				selectedIndex = 0;
-
-				searching = false;
-
-				onBack();
-
-				return true;
-			}
-
-			if (event == Event::ArrowRight || event == Event::L || event == Event::l) {
+			if (event == Event::ArrowRight || event == Event::Character('l') || event == Event::Character('L')) {
 				if (currentPage < totalPages) {
 					++currentPage;
 
@@ -203,7 +198,7 @@ namespace ui {
 				return true;
 			}
 
-			if (event == Event::ArrowLeft || event == Event::J || event == Event::j) {
+			if (event == Event::ArrowLeft || event == Event::Character('j') || event == Event::Character('J')) {
 				if (currentPage > 1) {
 					--currentPage;
 
@@ -213,11 +208,26 @@ namespace ui {
 				return true;
 			}
 
-			if (event == Event::M || event == Event::m) {
+			if (event == Event::Character('m') || event == Event::Character('M')) {
 				if (!results.empty()) {
 					onAlbumClick(results[selectedIndex].master_id);
 				}
 
+				return true;
+			}
+
+			if (event == Event::Return) {
+				input->TakeFocus();
+				return true;
+			}
+
+			if (event == Event::Escape) {
+				query.clear();
+				results.clear();
+				currentPage = 1;
+				totalPages = 1;
+				selectedIndex = 0;
+				onBack();
 				return true;
 			}
 
